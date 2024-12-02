@@ -1,0 +1,33 @@
+WITH seasonal_data AS (
+  SELECT
+    CASE
+      WHEN EXTRACT(MONTH FROM date_local) IN (1, 2, 3) THEN CONCAT(CAST(EXTRACT(YEAR FROM date_local) AS STRING), '-Q1')
+      WHEN EXTRACT(MONTH FROM date_local) IN (4, 5, 6) THEN CONCAT(CAST(EXTRACT(YEAR FROM date_local) AS STRING), '-Q2')
+      WHEN EXTRACT(MONTH FROM date_local) IN (7, 8, 9) THEN CONCAT(CAST(EXTRACT(YEAR FROM date_local) AS STRING), '-Q3')
+      WHEN EXTRACT(MONTH FROM date_local) IN (10, 11, 12) THEN CONCAT(CAST(EXTRACT(YEAR FROM date_local) AS STRING), '-Q4')
+    END AS season,
+    city_name,
+    state_name,
+    aqi
+  FROM
+    `bigquery-public-data.epa_historical_air_quality.pm25_frm_daily_summary`
+  WHERE
+    city_name = "San Jose"
+    AND state_name = "California"
+    AND sample_duration = "24 HOUR"
+    AND poc = 1
+    AND date_local BETWEEN '2015-01-01' AND '2019-12-31'
+    AND aqi IS NOT NULL
+)
+SELECT
+  season,
+  city_name,
+  state_name,
+  ROUND(AVG(aqi), 2) AS avg_seasonal_aqi -- Average AQI for the season
+FROM
+  seasonal_data
+GROUP BY
+  season, city_name, state_name
+ORDER BY
+  season;
+
