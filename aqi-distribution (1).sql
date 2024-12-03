@@ -16,7 +16,7 @@ WHERE
   AND state_name = "California"
   AND sample_duration = "24 HOUR"
   AND poc = 1
-  AND EXTRACT(YEAR FROM date_local) = 2021
+  AND EXTRACT(YEAR FROM date_local) = 2020
 GROUP BY
   2
 ORDER BY
